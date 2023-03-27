@@ -66,6 +66,7 @@ You can customize the Dropdown as follow:
 - `highlightSelectedItem`: Highlight selected item. Default: false
 - `selectedItemBackgroundColor`: Selected item background color. Default: system blue
 - `selectedItemTextColor`: Selected item text color. Default: white
+- `dropdownSeparatorStyle`: Dropdown item separator style
 
 #### API
 
