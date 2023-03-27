@@ -69,6 +69,8 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
     public var disableTapToDismiss: Bool = false
     /// Space between the box and the dropdown. Default: 8
     public var dropdownExtraSpace: CGFloat = 8
+    /// Dropdown separator style. Default: singleLine
+    public var dropdownSeparatorStyle: UITableViewCell.SeparatorStyle = .singleLine
     /// Dropdown items background color. Default: white
     public var itemsBackgroundColor: UIColor? = .white
     /// Show checkmark for selected item. Default: true
@@ -88,11 +90,26 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
         }
         set {
             currentSelectedIndex = newValue
+            if let index = selectedIndex, options.indices.contains(index) {
+                dropdown.text = options[index]
+            } else {
+                dropdown.text = placeholderText
+            }
         }
     }
     /// Current selected item
     public var selectedItem: String? {
         return currentSelectedItem
+    }
+    ///
+    lazy var convertedPoint: CGFloat? = (self.superview?.convert(self.center, to: self.getParentViewController?.view).y ?? 0) + self.frame.height
+    public var dropdownStartPoint: CGFloat? {
+        get {
+            return convertedPoint
+        }
+        set {
+            convertedPoint = newValue
+        }
     }
     
     override init(frame: CGRect) {
@@ -141,7 +158,7 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
         
         dropdownViewController = DropdownViewController(width: dropdown.frame.width,
                                                         height: dropdownHeight,
-                                                        startPosition: frame.maxY,
+                                                        startPosition: dropdownStartPoint ?? frame.maxY,
                                                         options: options,
                                                         cornerRadius: cornerRadius,
                                                         borderWidth: borderWidth,
@@ -157,10 +174,11 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
                                                         checkmarkColor: checkmarkColor,
                                                         highlightSelectedItem: highlightSelectedItem,
                                                         selectedItemBackgroundColor: selectedItemBackgroundColor,
-                                                        selectedItemTextColor: selectedItemTextColor)
+                                                        selectedItemTextColor: selectedItemTextColor,
+                                                        separatorStyle: dropdownSeparatorStyle)
         dropdownViewController.delegate = self
         
-        UIApplication.shared.visibleViewController?.present(self.dropdownViewController, animated: true)
+        UIApplication.shared.getVisibleViewController?.present(self.dropdownViewController, animated: true)
         
     }
     
@@ -278,6 +296,7 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
         private var highlightSelectedItem: Bool = false
         private var selectedItemBackgroundColor: UIColor = .systemBlue
         private var selectedItemTextColor: UIColor = .white
+        private var separatorStyle: UITableViewCell.SeparatorStyle = .singleLine
         
         var delegate: DropdownViewControllerDelegate?
         
@@ -303,7 +322,8 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
              checkmarkColor: UIColor?,
              highlightSelectedItem: Bool,
              selectedItemBackgroundColor: UIColor,
-             selectedItemTextColor: UIColor) {
+             selectedItemTextColor: UIColor,
+             separatorStyle: UITableViewCell.SeparatorStyle) {
             
             self.width = width
             self.height = height ?? min(CGFloat(options.count)*itemsRowHeight, 300)
@@ -318,6 +338,7 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
             self.highlightSelectedItem = highlightSelectedItem
             self.selectedItemBackgroundColor = selectedItemBackgroundColor
             self.selectedItemTextColor = selectedItemTextColor
+            self.separatorStyle = separatorStyle
             
             super.init(nibName: nil, bundle: nil)
             view.backgroundColor = .clear
@@ -342,6 +363,7 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
             tableView.dataSource = self
             tableView.register(DropDownCell.self, forCellReuseIdentifier: "cell")
             tableView.bounces = false
+            tableView.separatorStyle = separatorStyle
             bgView.addSubview(tableView)
             
             tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -428,9 +450,9 @@ private protocol DropdownViewControllerDelegate {
     func dropdownClosed() -> Void
 }
 
-extension UIApplication {
+fileprivate extension UIApplication {
 
-    var visibleViewController: UIViewController? {
+    var getVisibleViewController: UIViewController? {
 
         if #available(iOS 13.0, *) {
             
@@ -466,5 +488,19 @@ extension UIApplication {
         }
 
         return rootViewController
+    }
+}
+
+fileprivate extension UIView {
+    var getParentViewController: UIViewController? {
+        // Starts from next (As we know self is not a UIViewController).
+        var parentResponder: UIResponder? = self.next
+        while parentResponder != nil {
+            if let viewController = parentResponder as? UIViewController {
+                return viewController
+            }
+            parentResponder = parentResponder?.next
+        }
+        return nil
     }
 }
