@@ -18,7 +18,7 @@
 import UIKit
 
 @objc public protocol SwiftDropdownDelegate: UITextFieldDelegate {
-    @objc optional func dropdownItemSelected(index: Int, item: String) -> Void
+    @objc optional func dropdownItemSelected(identifier: String?, index: Int, item: String) -> Void
 }
 
 public enum ArrowPosition {
@@ -35,12 +35,14 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
     private var currentSelectedItem: String?
     
     public var delegate: SwiftDropdownDelegate?
+    /// Dropdown identifier
+    @IBInspectable public var identifier: String?
     /// Dropdown height. By default will be calculated automatically.
     public var dropdownHeight: CGFloat?
-    /// Dropdown box background color. Default: white
-    public var boxBackgroundColor: UIColor = .white
+    /// Dropdown box background color.
+    public var boxBackgroundColor: UIColor = UIColor(red: 227/255, green: 227/255, blue: 227/255, alpha: 1)
     /// Dropdown box text
-    public var placeholderText: String? = ""
+    public var placeholderText: String? = "Select..."
     /// Dropdown box text font. Default: System font
     public var placeholderFont: UIFont? = UIFont.systemFont(ofSize: 16)
     /// Dropdown box text color. Default: black
@@ -51,12 +53,12 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
     public var arrowImage: UIImage?
     /// Arrow position. Default: right
     public var arrowPosition: ArrowPosition = .right
-    /// Box and dropdown corner radius
-    public var cornerRadius: CGFloat = 0
+    /// Box and dropdown corner radius. Default: 8
+    public var cornerRadius: CGFloat = 8
     /// Box and dropdown border width. Default: 1
     public var borderWidth: CGFloat = 1
-    /// Box and dropdown border color. Default: black
-    public var borderColor: CGColor? = UIColor.black.cgColor
+    /// Box and dropdown border color. Default: lightGray
+    public var borderColor: CGColor? = UIColor.lightGray.cgColor
     /// Disable arrow animation. Default: true
     public var disableArrowAnimation: Bool = true
     /// Dropdown items row height. Default: 44
@@ -188,7 +190,7 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
         dropdown.text = item
         currentSelectedIndex = index
         currentSelectedItem = item
-        delegate?.dropdownItemSelected?(index: index, item: item)
+        delegate?.dropdownItemSelected?(identifier: identifier, index: index, item: item)
     }
     
     fileprivate func dropdownClosed() {
@@ -222,6 +224,8 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
                 
                 switch arrowPosition {
                 case .left:
+                    arrow.widthAnchor.constraint(equalToConstant: 24).isActive = true
+                    arrow.heightAnchor.constraint(equalToConstant: 24).isActive = true
                     arrow.leadingAnchor.constraint(equalTo: arrowView.leadingAnchor, constant: 16).isActive = true
                     arrow.topAnchor.constraint(equalTo: arrowView.topAnchor, constant: 0).isActive = true
                     arrow.rightAnchor.constraint(equalTo: arrowView.rightAnchor, constant: -8).isActive = true
@@ -230,6 +234,8 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
                     leftView = arrowView
                     leftViewMode = .always
                 case .right:
+                    arrow.widthAnchor.constraint(equalToConstant: 24).isActive = true
+                    arrow.heightAnchor.constraint(equalToConstant: 24).isActive = true
                     arrow.leadingAnchor.constraint(equalTo: arrowView.leadingAnchor, constant: 0).isActive = true
                     arrow.topAnchor.constraint(equalTo: arrowView.topAnchor, constant: 0).isActive = true
                     arrow.rightAnchor.constraint(equalTo: arrowView.rightAnchor, constant: -16).isActive = true

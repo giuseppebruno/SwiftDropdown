@@ -42,14 +42,15 @@ You can customize the Dropdown as follow:
 
 #### Dropdown box
 
-- `boxBackgroundColor`: Dropdown box background color. Default: white
+- `identifier`: Dropdown identifier
+- `boxBackgroundColor`: Dropdown box background color. Default: #E3E3E3
 - `placeholderFont`: Dropdown box text font. Default: System font
 - `placeholderColor`: Dropdown box text color. Default: black
 - `arrowImage`: Dropdown arrow image.
 - `arrowPosition`: Arrow position. Default: right
-- `cornerRadius`: Box and dropdown corner radius
+- `cornerRadius`: Box and dropdown corner radius. Default: 8
 - `borderWidth`: Box and dropdown border width. Default: 1
-- `borderColor`: Box and dropdown border color. Default: black
+- `borderColor`: Box and dropdown border color. Default: lightGray
 - `disableArrowAnimation`: Disable arrow animation. Default: true
 
 #### Dropdown
@@ -84,7 +85,7 @@ dropdown.delegate = self
 
 ...
 
-func dropdownItemSelected(index: Int, item: String) {}
+func dropdownItemSelected(identifier: String?, index: Int, item: String) {}
 
 ```
 
