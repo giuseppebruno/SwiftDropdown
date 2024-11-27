@@ -50,7 +50,7 @@ public class SwiftDropdown: UIView, DropdownViewControllerDelegate {
     /// Items array
     public var options: [String] = []
     /// Arrow image
-    public var arrowImage: UIImage?
+    public var arrowImage: UIImage? = UIImage(named: "arrow")
     /// Arrow position. Default: right
     public var arrowPosition: ArrowPosition = .right
     /// Box and dropdown corner radius. Default: 8
